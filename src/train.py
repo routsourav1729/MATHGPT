@@ -13,7 +13,7 @@ from torch.nn.parallel import DistributedDataParallel as DDP
 
 from model import GPT
 from dataloader import DataLoaderLite
-from src.hellaswag_eval import render_example, iterate_examples, get_most_likely_row
+#from hellaswag_eval import render_example, iterate_examples, get_most_likely_row
 
 torch.set_float32_matmul_precision('high')    # enable TF32 precision
 
@@ -72,7 +72,7 @@ class Trainer:
 
             # evaluate model performance on HellaSwag every once in a while
             if ((step > 0 and step % self.eval_freq == 0) or self.is_last_step) and (not use_torch_compile):
-                self.evaluate_helloswag(step)
+                #self.evaluate_helloswag(step)
 
             # generate sequences from the model every once in a while
             if ((step > 0 and step % self.eval_freq == 0) or self.is_last_step) and (not use_torch_compile):

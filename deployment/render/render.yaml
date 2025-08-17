@@ -1,0 +1,16 @@
+# Render deployment configuration for MATHGPT
+services:
+  - type: web
+    name: mathgpt-api
+    env: python
+    buildCommand: |
+      pip install -r requirements.txt
+    startCommand: |
+      cd api && uvicorn main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.10.0
+      - key: PYTHONPATH
+        value: /opt/render/project/src:/opt/render/project/src:/opt/render/project/reason:/opt/render/project/api
+    healthCheckPath: /health
+    plan: free  # Free tier
