@@ -1,0 +1,58 @@
+name: Test MATHGPT
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pytest httpx
+        pip install -r requirements.txt
+    
+    - name: Test API imports
+      run: |
+        cd api
+        python -c "from models import QuestionRequest, SolutionResponse; print('✅ Models import successful')"
+        python -c "from main import app; print('✅ FastAPI app import successful')"
+    
+    - name: Test basic functionality
+      run: |
+        cd api
+        python -c "
+        from models import QuestionRequest
+        req = QuestionRequest(question='Test question', max_tokens=50)
+        print(f'✅ Request validation works: {req.question}')
+        "
+    
+    - name: Run pytest (if tests exist)
+      run: |
+        if [ -d "tests" ]; then
+          pytest tests/ -v
+        else
+          echo "⚠️ No tests directory found, skipping pytest"
+        fi
+    
+    - name: Test Docker build
+      run: |
+        docker build -f docker/Dockerfile.api -t mathgpt-test .
+        echo "✅ Docker build successful"
+    
+    - name: Cleanup
+      run: |
+        docker image rm mathgpt-test || true
